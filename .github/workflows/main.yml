@@ -1,34 +1,20 @@
-name:   DOCKER-PIPELINE
+name  :   CI-WORKFLOW
+on  : 
+  push  : 
+jobs  : 
+  build  : 
+    runs-on  :  ubuntu-latest
+    steps  : 
+      - name  :  Checkout Code
+        uses  :  actions/checkout@v7
 
-on: 
-  push:
-     branch: master
+      - name  :  Setup NodeJS
+        uses  :  actions/setup-node@v3
+        with  : 
+          node-version  :  22
 
-env:
-  image: swiggy:v1
-  repo: rahamshaik/nodeimage
-  
-jobs: 
-  Build-Push-Docker-Image: 
-    runs-on:  ubuntu-latest
-    steps: 
-      - name:  Checkout Code
-        uses:  actions/checkout@v3
+      - name  :  Install Dependencies
+        run  :  npm install
 
-      - name: Set up Docker
-        uses: docker/setup-docker-action@v5
-
-      - name: building image
-        run: docker build -t ${{ env.image }} .
-
-      - name: tag image
-        run: docker tag ${{ env.image }} ${{ env.repo }}
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: push image
-        run: docker push ${{ env.repo }}
+      - name  :  Build Application
+        run  :  npm run build
